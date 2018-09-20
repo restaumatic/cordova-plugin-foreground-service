@@ -6,9 +6,12 @@ import android.app.Service;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.os.IBinder;
 import android.os.Bundle;
 import android.annotation.TargetApi;
+
+import com.restaumatic.ros.MainActivity;
 
 public class ForegroundService extends Service {
     @Override
@@ -33,30 +36,28 @@ public class ForegroundService extends Service {
             // Delete notification channel if it already exists
             NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             manager.deleteNotificationChannel("foreground.service.channel");
-        }
 
-        // Get notification channel importance
-        Integer importance;
+            // Get notification channel importance
+            Integer importance;
 
-        try {
-            importance = Integer.parseInt((String) extras.get("importance"));
-        } catch (NumberFormatException e) {
-            importance = 1;
-        }
+            try {
+                importance = Integer.parseInt((String) extras.get("importance"));
+            } catch (NumberFormatException e) {
+                importance = 1;
+            }
 
-        switch(importance) {
-            case 2:
-                importance = NotificationManager.IMPORTANCE_DEFAULT;
-                break;
-            case 3:
-                importance = NotificationManager.IMPORTANCE_HIGH;
-                break;
-            default:
-                importance = NotificationManager.IMPORTANCE_LOW;
-            // We are not using IMPORTANCE_MIN because we want the notification to be visible
-        }
+            switch(importance) {
+                case 2:
+                    importance = NotificationManager.IMPORTANCE_DEFAULT;
+                    break;
+                case 3:
+                    importance = NotificationManager.IMPORTANCE_HIGH;
+                    break;
+                default:
+                    importance = NotificationManager.IMPORTANCE_LOW;
+                // We are not using IMPORTANCE_MIN because we want the notification to be visible
+            }
 
-        if (android.os.Build.VERSION.SDK_INT >= 26) {
             // Create notification channel
             NotificationChannel channel = new NotificationChannel("foreground.service.channel", "Background Services", importance);
             channel.setDescription("Enables background processing.");
@@ -66,13 +67,23 @@ public class ForegroundService extends Service {
         // Get notification icon
         int icon = getResources().getIdentifier((String) extras.get("icon"), "drawable", context.getPackageName());
 
+        Notification.Builder builder;
+        if (android.os.Build.VERSION.SDK_INT >= 26) {
+            builder = new Notification.Builder(context, "foreground.service.channel");
+        } else {
+            builder = new Notification.Builder(context);
+        }
+
         // Make notification
-        Notification notification = new Notification.Builder(context, "foreground.service.channel")
+        Notification notification = builder
             .setContentTitle((CharSequence) extras.get("title"))
             .setContentText((CharSequence) extras.get("text"))
             .setOngoing(true)
+            // bring back the app after clicking notification
+            .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0))
             .setSmallIcon(icon == 0 ? 17301514 : icon) // Default is the star icon
             .build();
+
 
         // Get notification ID
         Integer id;
