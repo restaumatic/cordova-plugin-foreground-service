@@ -28,9 +28,12 @@ public class ForegroundService extends Service {
     private void startPluginForegroundService(Bundle extras) {
         Context context = getApplicationContext();
 
-        // Delete notification channel if it already exists
-        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.deleteNotificationChannel("foreground.service.channel");
+
+        if (android.os.Build.VERSION.SDK_INT >= 26) {
+            // Delete notification channel if it already exists
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            manager.deleteNotificationChannel("foreground.service.channel");
+        }
 
         // Get notification channel importance
         Integer importance;
@@ -53,10 +56,12 @@ public class ForegroundService extends Service {
             // We are not using IMPORTANCE_MIN because we want the notification to be visible
         }
 
-        // Create notification channel
-        NotificationChannel channel = new NotificationChannel("foreground.service.channel", "Background Services", importance);
-        channel.setDescription("Enables background processing.");
-        getSystemService(NotificationManager.class).createNotificationChannel(channel);
+        if (android.os.Build.VERSION.SDK_INT >= 26) {
+            // Create notification channel
+            NotificationChannel channel = new NotificationChannel("foreground.service.channel", "Background Services", importance);
+            channel.setDescription("Enables background processing.");
+            getSystemService(NotificationManager.class).createNotificationChannel(channel);
+        }
 
         // Get notification icon
         int icon = getResources().getIdentifier((String) extras.get("icon"), "drawable", context.getPackageName());
