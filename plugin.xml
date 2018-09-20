@@ -22,10 +22,9 @@
         </config-file>
     </platform>
 
-    <!-- Only android 26+ is accepted -->
     <engines>
         <engine name="cordova" version=">=8.0.0" />
         <engine name="cordova-android" version=">=7.0.0" />
-        <engine name="android-sdk" version=">=26" />
+        <engine name="android-sdk" version=">=5" />
     </engines>
 </plugin>

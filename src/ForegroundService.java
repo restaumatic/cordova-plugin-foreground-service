@@ -25,7 +25,6 @@ public class ForegroundService extends Service {
         return START_STICKY;
     }
 
-    @TargetApi(26)
     private void startPluginForegroundService(Bundle extras) {
         Context context = getApplicationContext();
 
